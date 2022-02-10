@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="fdd33ba7-a27c-45e6-9b90-7716d4cb89ef" basePath="/data/2.5/" >
+		<http:request-connection host="api.openweathermap.org" />
+	</http:request-config>
+	<flow name="getLocationsFlow" doc:id="c7505609-775b-4e0c-acdb-731dfca4428d" >
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="86e0e250-fa27-4d09-944e-5b20ad990102" variableName="city_id"/>
+		<http:request method="GET" doc:name="Request" doc:id="c0af1ec1-16bf-49bf-970f-77a443a815b2" config-ref="HTTP_Request_configuration" path="weather">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"appid" : "0cfdc2e5898031448ac3b8c82a439105",
+	"id" : "2172797"
+}]]]></http:query-params>
+		</http:request>
+	</flow>
+</mule>

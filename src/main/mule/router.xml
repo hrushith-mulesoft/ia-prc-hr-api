@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
-    <http:listener-config name="prc-hr-api-httpListenerConfig">
-        <http:listener-connection host="0.0.0.0" port="8081" />
-    </http:listener-config>
-    <apikit:config name="prc-hr-api-config" api="resource::f63a4349-ce64-4db1-9509-c9fb8504dc3b:prc-hr-api:1.0.0:raml:zip:prc-hr-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <apikit:config name="prc-hr-api-config" api="resource::f63a4349-ce64-4db1-9509-c9fb8504dc3b:prc-hr-api:1.0.3:raml:zip:prc-hr-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" >
+		<apikit:flow-mappings >
+			<apikit:flow-mapping resource="/employees" action="get" flow-ref="get:\employees:prc-hr-api-config" />
+			<apikit:flow-mapping resource="/employees" action="post" flow-ref="post:\employees:prc-hr-api-config" />
+			<apikit:flow-mapping resource="/contractors" action="get" flow-ref="get:\contractors:prc-hr-api-config" />
+			<apikit:flow-mapping resource="/contractors" action="post" flow-ref="post:\contractors:prc-hr-api-config" />
+			<apikit:flow-mapping resource="/officeLocations" action="get" flow-ref="get:\officeLocations:prc-hr-api-config" />
+		</apikit:flow-mappings>
+	</apikit:config>
     <flow name="prc-hr-api-main">
-        <http:listener config-ref="prc-hr-api-httpListenerConfig" path="/api/*">
+        <http:listener path="/api/*" config-ref="prc-hr-api-httpListenerConfig">
             <http:response statusCode="#[vars.httpStatus default 200]">
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:response>
             <http:error-response statusCode="#[vars.httpStatus default 500]">
-                <http:body>#[payload]</http:body>
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
         <apikit:router config-ref="prc-hr-api-config" />
@@ -97,13 +102,13 @@ output application/json
         </error-handler>
     </flow>
     <flow name="prc-hr-api-console">
-        <http:listener config-ref="prc-hr-api-httpListenerConfig" path="/console/*">
+        <http:listener path="/console/*" config-ref="prc-hr-api-httpListenerConfig">
             <http:response statusCode="#[vars.httpStatus default 200]">
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:response>
             <http:error-response statusCode="#[vars.httpStatus default 500]">
-                <http:body>#[payload]</http:body>
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
         <apikit:console config-ref="prc-hr-api-config" />
@@ -124,19 +129,18 @@ output application/json
         </error-handler>
     </flow>
     <flow name="get:\employees:prc-hr-api-config">
-        <ee:transform>
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  EmployeeID: "12356",
-  EmployeeName: "John Wick",
-  BusinessUnit: "Technology",
-  JobTitle: "Consultant",
-  CareerModelLevel: "5"
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+        <flow-ref doc:name="Flow Reference" doc:id="12f20dad-512b-4e3f-9e2d-4f6b1eb2237f" name="getEmployeesFlow" />
+    </flow>
+    <flow name="get:\contractors:prc-hr-api-config">
+        <flow-ref doc:name="Flow Reference" doc:id="d229f25b-9d3f-40e2-a6ca-726db8ac3d90" name="getContractorsFlow" />
+    </flow>
+    <flow name="get:\officeLocations:prc-hr-api-config">
+        <flow-ref doc:name="Flow Reference" doc:id="f8ac511c-f78e-44b9-8a67-5994bf8888ac" name="getLocationsFlow" />
+    </flow>
+    <flow name="post:\contractors:prc-hr-api-config">
+        <flow-ref doc:name="Flow Reference" doc:id="4673fedb-540f-4ab7-b350-aff10bd5cd65" name="postContractorsFlow" />
+    </flow>
+    <flow name="post:\employees:prc-hr-api-config">
+        <flow-ref doc:name="Flow Reference" doc:id="11f1616b-175a-4502-867e-bf90586e6fd5" name="postEmployeesFlow" />
     </flow>
 </mule>
