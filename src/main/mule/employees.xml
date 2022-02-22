@@ -1,16 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-	<flow name="getEmployeesFlow" doc:id="41e868b7-2de2-4a62-97e8-4a37f68cdb55" >
-		<ee:transform doc:name="Transform Message" doc:id="4966c347-f950-4ea5-9024-80279d41103a" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="06f9c3c3-1630-41d1-859d-b0b83c05a269" basePath="/api">
+		<http:request-connection host="ia-sys-adp-api.us-e2.cloudhub.io" />
+	</http:request-config>
+	<flow name="get-employees" doc:id="41e868b7-2de2-4a62-97e8-4a37f68cdb55" >
+		<set-variable value="#[attributes.queryParams.countyName]" doc:name="Set Variable" doc:id="823c22bd-7d76-4814-9ba6-43a4e59e27ba" variableName="countyName"/>
+		<http:request method="GET" doc:name="Request" doc:id="3d3b6125-5784-47cd-85a3-928cb75f486f" config-ref="HTTP_Request_configuration" path="/employees">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	client_secret : '690AbEDbab4B497380DB59e60280B8e7',
+	client_id : '6b566bb2728f464e8882263ff0000a9c'
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="4966c347-f950-4ea5-9024-80279d41103a">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-"Employee Fetched"]]></ee:set-payload>
+
+payload filter ((value,index) -> value.county == vars.countyName)]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 	</flow>

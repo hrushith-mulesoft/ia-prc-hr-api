@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
-    <apikit:config name="prc-hr-api-config" api="resource::f63a4349-ce64-4db1-9509-c9fb8504dc3b:prc-hr-api:1.0.3:raml:zip:prc-hr-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" >
-		<apikit:flow-mappings >
-			<apikit:flow-mapping resource="/employees" action="get" flow-ref="get:\employees:prc-hr-api-config" />
-			<apikit:flow-mapping resource="/employees" action="post" flow-ref="post:\employees:prc-hr-api-config" />
-			<apikit:flow-mapping resource="/contractors" action="get" flow-ref="get:\contractors:prc-hr-api-config" />
-			<apikit:flow-mapping resource="/contractors" action="post" flow-ref="post:\contractors:prc-hr-api-config" />
-			<apikit:flow-mapping resource="/officeLocations" action="get" flow-ref="get:\officeLocations:prc-hr-api-config" />
-		</apikit:flow-mappings>
-	</apikit:config>
+    <apikit:config name="prc-hr-api-config" api="resource::f63a4349-ce64-4db1-9509-c9fb8504dc3b:prc-hr-api:1.0.4:raml:zip:prc-hr-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="prc-hr-api-main">
         <http:listener path="/api/*" config-ref="prc-hr-api-httpListenerConfig">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -129,7 +121,7 @@ output application/json
         </error-handler>
     </flow>
     <flow name="get:\employees:prc-hr-api-config">
-        <flow-ref doc:name="Flow Reference" doc:id="12f20dad-512b-4e3f-9e2d-4f6b1eb2237f" name="getEmployeesFlow" />
+        <flow-ref doc:name="Flow Reference" doc:id="12f20dad-512b-4e3f-9e2d-4f6b1eb2237f" name="get-employees" />
     </flow>
     <flow name="get:\contractors:prc-hr-api-config">
         <flow-ref doc:name="Flow Reference" doc:id="d229f25b-9d3f-40e2-a6ca-726db8ac3d90" name="getContractorsFlow" />
