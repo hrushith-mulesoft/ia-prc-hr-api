@@ -133,6 +133,6 @@ output application/json
         <flow-ref doc:name="Flow Reference" doc:id="4673fedb-540f-4ab7-b350-aff10bd5cd65" name="postContractorsFlow" />
     </flow>
     <flow name="post:\employees:prc-hr-api-config">
-        <flow-ref doc:name="Flow Reference" doc:id="11f1616b-175a-4502-867e-bf90586e6fd5" name="postEmployeesFlow" />
+        <flow-ref doc:name="Flow Reference" doc:id="11f1616b-175a-4502-867e-bf90586e6fd5" name="add-employees" />
     </flow>
 </mule>
