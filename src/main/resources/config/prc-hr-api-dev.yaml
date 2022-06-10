@@ -1,0 +1,28 @@
+
+mule:
+  apiID: ""
+  
+adp:
+  host: "ia-sys-adp-api.us-e2.cloudhub.io"
+  port: "8081"
+  client_id: "ff4c0827ace94e5f831e0fcec6a8fd2c"
+  client_secret: "64f53a5c15b241e28D2c3e1F4c81b6D3"
+  max_timeout: "60000"
+  max_retries: "2"
+  max interval: "3000"
+  path:
+    employees: /employees 
+    contractors: /contractors
+ 
+  
+salesforce:
+  host: ""
+  port: ""
+  client_id: ""
+  client_secret: ""
+  max_timeout: "60000"
+  max_retries: "2"
+  max interval: "3000"
+  path:
+    employees: /employees
+    contractors: /contractors

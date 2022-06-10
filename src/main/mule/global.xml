@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
-	<api-gateway:autodiscovery apiId="17610030" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="61a78f24-6418-44d5-8f78-abec9622aa3c" flowRef="prc-hr-api-main" />
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	<api-gateway:autodiscovery apiId="17892385" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="61a78f24-6418-44d5-8f78-abec9622aa3c" flowRef="prc-hr-api-main" />
 	<http:listener-config name="prc-hr-api-httpListenerConfig" doc:name="HTTP Listener config" doc:id="b17f494c-74ae-4d37-8494-6d1cc2d71159">
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
+	<http:request-config name="ADP_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="8c7ba56f-930e-498d-a6c5-da94a821457e" >
+		<http:request-connection host="${secure::adp.host}" port="${secure::adp.port}" />
+	</http:request-config>
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="e692246f-d4dc-4a7d-865a-a90b0ca98d52" file="config\prc-hr-api-${mule.env}.yaml" key="${mule.key}" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+	<http:request-config name="Salesforce_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="c1dbbec4-9d5e-47e6-8800-0b9a098c2482" >
+		<http:request-connection host="${secure::salesforce.host}" port="${secure::salesforce.port}" />
+	</http:request-config>
 </mule>

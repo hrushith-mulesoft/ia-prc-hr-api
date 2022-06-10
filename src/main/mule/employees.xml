@@ -5,23 +5,14 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
-	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="06f9c3c3-1630-41d1-859d-b0b83c05a269" basePath="/api">
-		<http:request-connection host="ia-sys-adp-api.us-e2.cloudhub.io" />
-	</http:request-config>
-	<http:request-config name="ADP_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="c5d4083f-b508-471f-b4a3-11f802de2563" basePath="/api" >
-		<http:request-connection host=" ia-sys-adp-api.us-e2.cloudhub.io" />
-	</http:request-config>
-	<http:request-config name="Salesforce_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="00e7d412-cde8-4765-bb50-d334c9b24113" basePath="/api" >
-		<http:request-connection host="ia-sys-salesforce-api.us-e2.cloudhub.io" />
-	</http:request-config>
 	<flow name="get-employees" doc:id="41e868b7-2de2-4a62-97e8-4a37f68cdb55" >
 		<set-variable value="#[attributes.queryParams.countyName]" doc:name="Set Variable" doc:id="823c22bd-7d76-4814-9ba6-43a4e59e27ba" variableName="countyName"/>
-		<http:request method="GET" doc:name="Request" doc:id="3d3b6125-5784-47cd-85a3-928cb75f486f" config-ref="HTTP_Request_configuration" path="/employees">
+		<http:request method="GET" doc:name="Request" doc:id="3d3b6125-5784-47cd-85a3-928cb75f486f" path="/employees" config-ref="ADP_HTTP_Request_configuration">
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
-	client_secret : '690AbEDbab4B497380DB59e60280B8e7',
-	client_id : '6b566bb2728f464e8882263ff0000a9c'
+	client_secret : '64f53a5c15b241e28D2c3e1F4c81b6D3',
+	client_id : 'ff4c0827ace94e5f831e0fcec6a8fd2c'
 }]]]></http:headers>
 		</http:request>
 		<ee:transform doc:name="Transform Message" doc:id="4966c347-f950-4ea5-9024-80279d41103a">
@@ -34,6 +25,52 @@ payload filter ((value,index) -> value.county == vars.countyName)]]></ee:set-pay
 			</ee:message>
 		</ee:transform>
 	</flow>
+	<flow name="variableTestFlow" doc:id="e14cf1e1-3114-45ee-80cd-2b3eccbb10af" >
+		<ee:transform doc:name="Transform Message" doc:id="3fc5ce1d-0db4-4475-a5f0-4cffad61dd73" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="33600f1a-9e88-4dab-a1ee-b0d22b694d1a" name="variableTestSub_Flow" />
+		<ee:transform doc:name="Transform Message" doc:id="3afcea4e-7ef8-4877-aa92-ecc0f197607a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+
+{
+	firstName: vars.firstName,
+	lastName: vars.lastName,
+	county: vars.county
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<sub-flow name="variableTestSub_Flow" doc:id="d584e217-1d3b-4bf0-b307-da57dc816fed" >
+		<ee:transform doc:name="Transform Message" doc:id="c5625d39-4c4e-4144-af0c-09b22ba063c4">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="firstName"><![CDATA[%dw 2.0
+output application/json
+---
+payload.first_name]]></ee:set-variable>
+				<ee:set-variable variableName="lastName"><![CDATA[%dw 2.0
+output application/json
+---
+payload.last_name]]></ee:set-variable>
+				<ee:set-variable variableName="county"><![CDATA[%dw 2.0
+output application/json
+---
+payload.county]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
 	<flow name="add-employees" doc:id="a7d282bd-4748-4806-8b57-b1e982de670d" >
 		<ee:transform doc:name="Transform Message" doc:id="eb29505d-eae7-4824-a543-a2b71c73c89e" >
 			<ee:message >
@@ -45,58 +82,16 @@ payload]]></ee:set-payload>
 		</ee:transform>
 		<scatter-gather doc:name="Scatter-Gather" doc:id="b53c42b2-d13d-4c63-aad6-b3c513328df7" >
 			<route >
-				<try doc:name="Try - Add Employees to ADP" doc:id="6d503766-a5ff-43b6-8003-b80d61c69877" >
-					<raise-error doc:name="Raise error" doc:id="159888d9-7514-490e-a40c-d221d98eb360" type="ADP:CONNECTIVITY" description="Connection to ADP Failed" />
-					<until-successful maxRetries="3" doc:name="Until Successful" doc:id="0968e032-5939-4f73-b0fd-f9dfbe60ad3a" millisBetweenRetries="3000">
-						<http:request method="POST" doc:name="POST | Employees ADP" doc:id="cd7f19d4-aa26-41d5-8c97-f3beb3840a04" config-ref="ADP_HTTP_Request_configuration" path="/employees">
+				<try doc:name="Try - Add Employees to ADP" doc:id="6d503766-a5ff-43b6-8003-b80d61c69877">
+					<http:request method="POST" doc:name="POST | Employees ADP" doc:id="cd7f19d4-aa26-41d5-8c97-f3beb3840a04" path="${secure::adp.path.employees}" config-ref="ADP_HTTP_Request_configuration">
 					<http:headers><![CDATA[#[output application/java
 ---
 {
-	client_secret : "7aA4E8270cE8472b90A77118abbFAcF2",
-	client_id : "971b5969a8c24e0faf5efc4c13106912"
+	client_secret : Mule::p('secure::adp.client_secret'),
+	client_id : Mule::p('secure::adp.client_id')
 }]]]></http:headers>
 				</http:request>
-					</until-successful>
-					<error-handler >
-						<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5a6b4d97-e573-4423-99da-ebcea9221fe9" type="ADP:CONNECTIVITY">
-							<ee:transform doc:name="Map Error" doc:id="f9cba644-74c4-4d12-b4e4-2c7b79fd710c">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-	Description: error.description
-}]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-							<logger level="INFO" doc:name="Logger" doc:id="bbdefef5-ddfc-46d8-ab82-cd188d2183a1" message="#[payload]" />
-						</on-error-propagate>
-						<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="4647267c-cd3d-436c-adad-369f9266eacc" type="ANY">
-							<ee:transform doc:name="Map Error" doc:id="4a93933b-288a-4e76-9c41-f30e542f98c6">
-								<ee:message>
-									<ee:set-payload><![CDATA[%dw 2.0
-output application/json
-import * from dw::core::Strings
----
-{
-	Description: error.description withMaxSize 256
-}]]></ee:set-payload>
-								</ee:message>
-							</ee:transform>
-							<logger level="INFO" doc:name="Logger" doc:id="1a7529d6-0336-4104-a9b0-4ee979d2abcc" message="#[payload]" />
-						</on-error-propagate>
-					</error-handler>
 				</try>
-			</route>
-			<route >
-				<http:request method="POST" doc:name="POST | Employees Salesforce" doc:id="7c97ea8b-3350-4b2b-8a9f-4a6a9fe304b3" config-ref="Salesforce_HTTP_Request_configuration" path="/employees">
-					<http:headers ><![CDATA[#[output application/java
----
-{
-	client_secret : "7aA4E8270cE8472b90A77118abbFAcF2",
-	client_id : "971b5969a8c24e0faf5efc4c13106912"
-}]]]></http:headers>
-				</http:request>
 			</route>
 			<route >
 				<ee:transform doc:name="Sample Route" doc:id="c8a8bbc5-9a21-4d9b-9977-cc5bcab9d6b4" >
